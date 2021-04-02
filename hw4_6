@@ -1,0 +1,76 @@
+
+#ifndef LSorter_h
+#define LSorter_h
+
+#include <stdio.h>
+#include "LNode.h"
+
+class LSorter {
+public:
+    LNode* sortList(LNode* head);
+};
+
+#endif /* LSorter_h */
+
+
+
+#include <algorithm>
+#include "LSorter.h"
+using namespace std;
+
+LNode* LSorter::sortList(LNode* head){
+  LNode *s1, *s2, *end, *bend;
+  int merge_count = 0;
+  int size = 1, size1, size2;
+  if (head != nullptr){ 
+    while (merge_count > 2 || merge_count == 0){
+      s1 = head;
+      head = nullptr;
+      end = nullptr;
+      merge_count = 1; 
+      while (s1){
+	s2 = s1;
+	size2 = size;
+	size1 = 0;
+	merge_count++;
+	while (s2 && size1 < size){
+	  size1++;
+	  s2 = s2 -> next;
+	}
+	while (size1 > 0 || (s2 != nullptr && size2 > 0)){
+	  if (s2  == nullptr || size2 <= 0 ){
+	    size1--;
+	    bend = s1;
+	    s1 = s1 -> next;
+	  }
+	  else if (size1 <= 0){
+	    size2--;
+	    bend = s2;
+	    s2 = s2 -> next;
+	  }
+	  else if ((s1->val) >= (s2 ->val)){
+	   bend = s2;
+	   s2 = s2 -> next;
+	   size2--;
+	   }
+	 else if ((s2->val) > (s1->val)){
+	   bend = s1;
+	   s1=s1 -> next;
+	   size1--;
+	 }
+	 if(!end)
+	    head = bend;
+	 else
+	    end -> next = bend;
+	 end = bend;
+	}
+       s1=s2;
+     }
+     end -> next = nullptr;
+     size = size * 2;
+    }
+    return head;
+  }
+  else
+    return head;
+}
