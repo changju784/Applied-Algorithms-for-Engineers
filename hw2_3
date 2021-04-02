@@ -1,0 +1,91 @@
+//Jungin Chang (U07196971)
+
+#ifndef MP
+#define MP 
+#include <iostream>
+
+using namespace std;
+
+class MaxProductClass{
+ public:
+  long MaxProduct(string f);
+  
+};
+#endif
+
+
+//Jungin Chang (U07196971)
+
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <vector>
+#include <stdlib.h>
+#include <algorithm>
+#include "MaxProduct.h"
+
+using namespace std;
+
+long MaxProductClass::MaxProduct(string f){
+  vector <string> sv;
+  vector <int> iv;
+  vector <int> comp; 
+  vector <int> res;
+  int i, n, x, y, z, num, max_now; 
+  long maxprod;
+  
+  // read the input file and store the string into string vector.
+  ifstream p3;   
+  p3.open(f);
+  string line; 
+  while(true){
+    p3 >> line;
+    if (p3.eof())break;
+    sv.push_back(line);
+  }
+  
+  // convert string array into int array.
+  sv.push_back("fin");
+  for (i = 0; sv[i] != "fin"; i++){
+    num = atoi(sv.at(i).c_str());
+    iv.push_back(num);
+  }
+
+  // calculate max product of each line and store it to new vector.
+  for (i = 0; i < iv.size(); i++){
+    if(iv[i+2] != -999999){
+      if(iv[i+1] == -999999 && iv[i-1] == -999999){  //isolated element case
+	max_now = iv[i];
+	res.push_back(max_now);
+	n++;
+      }
+      else if (i == 0 && iv[i+1] == -999999){  //first isolated element case
+	max_now = iv[i];
+	res.push_back(max_now);
+      }
+      else{
+	x = iv[i]*iv[i+1];   //compare two and three products
+	y = iv[i]*iv[i+1]*iv[i+2];
+	z = max(x,y);
+	comp.push_back(z);
+      }
+    }
+    else{
+      max_now = *max_element(comp.begin(), comp.end());
+      comp.clear();
+      res.push_back(max_now); 
+      i = i+2;
+      n++;
+    }
+  }
+ 
+  // print and find max of max product of the new vector.
+  for(auto it = res.begin(); it != res.end(); ++it)
+     cout << *it << endl;
+  for (i = 0; i <= n; i++){
+    if (res[0] < res[i])
+      res[0] = res[i];
+  }
+  maxprod = res[0];
+  return maxprod;
+}
