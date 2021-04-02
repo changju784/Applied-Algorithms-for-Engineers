@@ -1,0 +1,74 @@
+
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <numeric>
+#include <bits/stdc++.h>
+using namespace std;
+#define SIZE 200
+
+
+// This is the function to determine real size of square matrix
+// Using getline, n_val will be numbers of charactors on the last line of txt file.
+int getN(){
+  ifstream getmaze("maze.txt");
+  string line;
+  int n_val;
+  while(getline(getmaze,line)){
+    n_val = line.length();
+  }
+  return n_val;
+}
+int N = getN();
+int path = N*N;
+
+// DFS_maze function receives char array and row x, row y, as well as distance n.
+// Starting with position '0' it uses recursion to follow up its direction towards right most end
+// Four if statements determine current position where to go.
+// If it reaches the end it will designate the value of path as shortest distance.
+void DFS_maze(char myArray[SIZE][SIZE], int x, int y, int n){
+  if(x == N-1 && y == N-1){
+    if(path > n){
+      path = n;
+    }
+    return;
+  }
+  myArray[x][y] = '0';
+  if(x > 0 && myArray[x-1][y] != '0')
+    DFS_maze(myArray,x-1,y,n+1);
+  if(x < N-1 && myArray[x+1][y] != '0')
+    DFS_maze(myArray,x+1,y,n+1);
+  if(y > 0 && myArray[x][y-1] != '0')
+    DFS_maze(myArray,x,y-1,n+1);
+  if(y < N-1 && myArray[x][y+1] != '0')
+    DFS_maze(myArray,x,y+1,n+1);
+  myArray[x][y] = '1';
+  
+}
+
+int main(){
+  ifstream file("maze.txt");
+  string line;
+  int row = 0, num_one = 0;
+  char mat[SIZE][SIZE];
+  while(getline(file,line)){
+    for(int i = 0; i < N; i++){
+      if(line[i] == '0' || line[i] == '1')
+   mat[row][i] = line[i];
+    }
+    row++; 
+  }
+  DFS_maze(mat,0,0,1);
+  for (int i = 0; i < N; i++){
+    for (int j = 0; j < N; j++){
+      if (mat[i][j] == '1'){
+   num_one++;
+      }
+    }
+  }
+  if(path < num_one) 
+    cout << path;
+  else
+    cout << '0';
+  return 0;
+}
