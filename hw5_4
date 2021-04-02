@@ -1,0 +1,113 @@
+#include<string>
+#include<sstream>
+#include<vector>
+#include<cmath>
+#include<iostream>
+#include<cstdlib>
+#include "CuckooHashTable.h"
+
+using namespace std;
+
+
+CuckooHashTable::CuckooHashTable() {
+  //default constructor that creates 2*13 empty vector.
+    vector<vector<string>> contents(2, vector<string>(LOGICAL_SIZE));
+}
+
+
+
+int CuckooHashTable::hashCode(string value, int which) {
+  //hashCode calculates 2 hash functions that determines position of each element in each table.
+    stringstream val(value);
+    int x = 0;
+    val >> x;
+    switch (which) {
+    case 1: return x % LOGICAL_SIZE;
+    case 2: return 11 - (x % 11);
+    }
+}
+
+void CuckooHashTable::add(string value) {
+  //add string value into table, if the position is occupied value pushes the older one and be placed.
+  //the older element will move to next hash function, and see if the next position is empty.
+  //if the next position is empty, it will be placed using recursion.
+  //if the next position is not emtpy, it pushes the other one and it will loop until the next elements settle down in empty position.
+  //if the moves become infinity, it prints error message and exit.
+  
+  contents.resize(2, vector<string>(LOGICAL_SIZE));
+  int pos1, pos2, repos1, repos2, occ1, occ2, counter = 0;
+  currentSize = LOGICAL_SIZE; 
+  int table1_pos[2], table2_pos[2], table2_occ[2];
+  for (int i = 0; i < 2; i++) {
+    table1_pos[i] = hashCode(value, i + 1);
+  }
+  pos1 = table1_pos[0];
+  pos2 = table1_pos[1];
+  
+  while(currentSize == LOGICAL_SIZE){
+  if (contents[0][pos1] != ""){
+    if (contents[0][pos1] == value || contents[1][pos2] == value){
+      value = "";
+       break;
+    }
+      string next = contents[0][pos1];
+      for (int j = 0; j < 2; j++) {
+	table2_pos[j] = hashCode(next, j + 1);
+      }
+      repos1 = table2_pos[0];
+      repos2 = table2_pos[1];
+      contents[0][pos1] = value;
+        if (contents[1][repos2] == "") {
+            contents[1][repos2] = next;
+            break;
+        }
+        else{
+	  string occ = contents[1][repos2];
+	  for (int k = 0; k < 2; k++){
+	    table2_occ[k] = hashCode(occ, k+1);
+	  }
+	  occ1 = table2_occ[0];
+	  occ2 = table2_occ[1];
+	  contents[1][repos2] = next;
+	  if (contents[0][occ1] == ""){
+	    contents[0][occ1] = occ;
+	    break;
+	  }
+	  else{
+	    if(pos1 == repos1 && pos2 == repos2 && repos1 == occ1 && repos2 == occ2){
+	      currentSize--;
+	      cout <<  "Error: Insert causes infinite loop" << endl;
+	      break;
+	    }
+	    else
+	      add(occ);
+	    break;
+	  }
+	}
+    }
+    else if (contents[0][pos1] == ""){
+        contents[0][pos1] = value;
+        break;
+    }
+  }
+}
+
+void CuckooHashTable::print() {
+  contents.resize(2,vector<string>(13));
+  if (currentSize == LOGICAL_SIZE){
+  cout << "Table 1:" << endl;
+  for (int i = 0; i < LOGICAL_SIZE; i++) {
+    if (contents[0][i] == "")
+      cout << "-" << endl;
+    else
+      cout << contents[0][i] << endl;
+  }
+  cout << "Table 2:" << endl;
+  for (int j = 0; j < LOGICAL_SIZE; j++) {
+    if (contents[1][j] == "")
+      cout << "-" << endl;
+    else
+      cout << contents[1][j] << endl;
+  }
+  }
+}
