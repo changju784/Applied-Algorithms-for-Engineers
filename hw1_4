@@ -1,0 +1,30 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+
+using namespace std;
+
+int main(int argc,char** argv){
+  char* filename; 
+  filename = argv[1];
+  ifstream p4;
+  p4.open(filename);
+  
+  if (p4.is_open()){
+    int length = 0;
+    string line;
+    string result;
+    while (getline(p4,line)){
+      if (line.length() > length){
+	length = line.length();
+	result = line;
+      }
+    }
+    p4.close();
+    cout << result << endl;
+  }
+  else
+    cout << " " << endl;
+  return 0;
+}
+
